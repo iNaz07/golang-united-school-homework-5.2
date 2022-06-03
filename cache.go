@@ -12,6 +12,10 @@ type Value struct {
 }
 
 func NewCache() Cache {
+	//value := Value{
+	//	Val:   "",
+	//	ExpAt: nil,
+	//}
 	cache := make(map[string]Value)
 	return Cache{
 		CacheMap: cache,
@@ -23,7 +27,7 @@ func (c *Cache) Get(key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	if value.ExpAt.Before(time.Now()) {
+	if value.ExpAt != nil && value.ExpAt.Before(time.Now()) {
 		delete(c.CacheMap, key)
 		return "", false
 	}
@@ -37,8 +41,11 @@ func (c *Cache) Put(key, value string) {
 
 func (c *Cache) Keys() []string {
 	keys := []string{}
+	if len(c.CacheMap) == 0 {
+		return nil
+	}
 	for k, v := range c.CacheMap {
-		if !v.ExpAt.Before(time.Now()) {
+		if v.ExpAt != nil && !v.ExpAt.Before(time.Now()) {
 			keys = append(keys, k)
 		} else {
 			delete(c.CacheMap, k)
