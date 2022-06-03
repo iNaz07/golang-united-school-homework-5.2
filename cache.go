@@ -40,16 +40,18 @@ func (c *Cache) Put(key, value string) {
 }
 
 func (c *Cache) Keys() []string {
-	keys := []string{}
+	keys := make([]string, 0)
 	if len(c.CacheMap) == 0 {
 		return nil
 	}
 	for k, v := range c.CacheMap {
 		if v.ExpAt != nil && !v.ExpAt.Before(time.Now()) {
 			keys = append(keys, k)
+			continue
 		} else {
 			delete(c.CacheMap, k)
 		}
+		keys = append(keys, k)
 	}
 	return keys
 }
